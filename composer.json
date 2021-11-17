@@ -1,0 +1,25 @@
+{
+    "name": "iayoo/laravel-api-response",
+    "description": "laravel api response",
+    "keywords": [
+        "laravel",
+        "api",
+        "response"
+    ],
+    "homepage": "https://github.com/iayoo/laravel-openapi",
+    "authors": [
+        {
+            "name": "Iayoo",
+            "email": "vilnius94@163.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Iayoo\\ApiResponse\\": "src/"
+        }
+    }
+}
