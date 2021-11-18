@@ -18,8 +18,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
+
 class LaravelHandle extends ExceptionHandler
 {
+
+    use \Iayoo\ApiResponse\Response\Laravel\ResponseTrait;
     protected $ignoreTrace = [
 
     ];
@@ -100,16 +103,7 @@ class LaravelHandle extends ExceptionHandler
         if (!$this->shouldReturnJson($request, $exception)){
             return $this->prepareResponse($request, $exception);
         }
-        return new JsonResponse(
-            [
-                'message' => 'api undefined',
-                'status'  => 40000,
-                'data'    => [],
-            ],
-            200,
-            $this->isHttpException($exception) ? $exception->getHeaders() : [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-        );
+        return $this->setStatusCode(404)->error('api undefined','40400');
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
@@ -117,30 +111,12 @@ class LaravelHandle extends ExceptionHandler
         if (!$this->shouldReturnJson($request, $exception)){
             redirect()->guest($exception->redirectTo() ?? route('login'));
         }
-        return new JsonResponse(
-            [
-                'message' => $exception->getMessage(),
-                'status'  => 40100,
-                'data'    => [],
-            ],
-            $this->isHttpException($exception) ? $exception->getStatusCode() : 200,
-            $this->isHttpException($exception) ? $exception->getHeaders() : [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-        );
+        return $this->setStatusCode(401)->error($exception->getMessage(),40100);
     }
 
 
     public function prepareJsonResponse($request, Throwable $e)
     {
-        return new JsonResponse(
-            [
-                'message' => $e->getMessage(),
-                'status'  => $e->getStatusCode(),
-                'data'    => $this->convertExceptionToArray($e),
-            ],
-            $this->isHttpException($e) ? $e->getStatusCode() : 200,
-            $this->isHttpException($e) ? $e->getHeaders() : [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-        );
+        return $this->exception($request,$e);
     }
 }
