@@ -83,7 +83,6 @@ class LaravelHandle extends ExceptionHandler
                 }
             }
         }
-
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
         } elseif ($e instanceof AuthenticationException) {
@@ -96,7 +95,6 @@ class LaravelHandle extends ExceptionHandler
             // 新增页面不存在的拦截
             return $this->undefined($request,$e);
         }
-
         return $this->shouldReturnJson($request, $e)
             ? $this->prepareJsonResponse($request, $e)
             : $this->prepareResponse($request, $e);
@@ -120,6 +118,13 @@ class LaravelHandle extends ExceptionHandler
 
     public function prepareJsonResponse($request, Throwable $e)
     {
-        return $this->exception($request,$e);
+        $this->setErrorCode(50000);
+        return $this->fail($e->getMessage(),[
+            'line'     => $e->getLine(),
+            'file'     => $e->getFile(),
+            'exception'=> get_class($e),
+//            'previous' => $e->getPrevious(),
+            'data'     => $e->getTrace(),
+        ]);
     }
 }
