@@ -6,12 +6,25 @@ namespace Iayoo\ApiResponse\Response\Laravel;
 
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Trait ResponseTrait
+ * 响应结构说明
+ * {
+ *     staut   // 描述 HTTP 响应结果：HTTP 状态响应码在 500-599 之间为”fail”，在 400-499 之间为”error”，其它均为”success”
+ *     code    // 业务描述操作码，比如 200001 表示注册成功
+ *     message // 响应描述
+ *     data    // 实际的响应数据
+ *     trace   // 异常时的调试信息
+ * }
+ * @package Iayoo\ApiResponse\Response\Laravel
+ */
 trait ResponseTrait
 {
+    /** @var int HTTP 状态码 */
     protected $httpStatusCode = 200;
-
-    protected $statusCode = 0;
-
+    /** @var string success|fail|error */
+    protected $statusCode = 'success';
+    /** @var int 业务错误骂  */
     protected $errorCode = 0;
 
     /**
@@ -24,7 +37,7 @@ trait ResponseTrait
     }
 
     /**
-     * @param int $statusCode
+     * @param string $statusCode
      */
     public function setStatusCode($statusCode)
     {
@@ -41,38 +54,46 @@ trait ResponseTrait
         return $this;
     }
 
-    public function success($message = 'success', $data = [], $code = 0)
+    /**
+     * 成功响应
+     * @param string|array $message 响应说明
+     * @param array $data 响应数据
+     * @return JsonResponse
+     */
+    public function success($message = 'success', $data = [])
     {
         if (is_array($message)) {
             $data    = $message;
             $message = 'success';
         }
-        return new JsonResponse(
-            [
-                'message' => $message,
-                'status'  => $this->statusCode,
-                'code'    => $code??$this->errorCode,
-                'data'    => $data,
-            ],
-            $this->httpStatusCode,
-            [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-        );
+        $this->setStatusCode('success');
+        return $this->response($message,$data);
     }
 
-    public function error($error, $code = 40000, $trace = [])
+    /**
+     * 通常为代码异常等
+     * 状态响应码在 500-599 之间为”fail”
+     * @param $message
+     * @param array $trace
+     * @return JsonResponse
+     */
+    public function fail($message,$trace = []){
+        $this->setStatusCode('fail');
+        return $this->response($message,[],$trace);
+    }
+
+    /**
+     * 用户操作等错误
+     * @param $message
+     * @param int $code 业务错误码
+     *
+     * @return JsonResponse
+     */
+    public function error($message, $code = 40000)
     {
-        return new JsonResponse(
-            [
-                'message' => $error,
-                'code'    => $code??$this->errorCode,
-                'status'  => $this->statusCode,
-                'trace'   => $trace
-            ],
-            $this->httpStatusCode,
-            [],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-        );
+        $this->setStatusCode('error');
+        $this->setErrorCode($code);
+        return $this->response($message,[]);
     }
 
     public function exception($request, $exception)
@@ -91,8 +112,15 @@ trait ResponseTrait
         );
     }
 
-    protected function response()
+    protected function response($message,$data,$trace = [])
     {
-
+        $status = $this->statusCode;
+        $code = $this->errorCode;
+        return new JsonResponse(
+            compact('message','status','code','data','trace'),
+            $this->httpStatusCode,
+            [],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
     }
 }

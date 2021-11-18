@@ -106,7 +106,7 @@ class LaravelHandle extends ExceptionHandler
         if (!$this->shouldReturnJson($request, $exception)){
             return $this->prepareResponse($request, $exception);
         }
-        return $this->setStatusCode(404)->error('undefined',40400);
+        return $this->error('undefined',40400);
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
@@ -114,7 +114,7 @@ class LaravelHandle extends ExceptionHandler
         if (!$this->shouldReturnJson($request, $exception)){
             redirect()->guest($exception->redirectTo() ?? route('login'));
         }
-        return $this->setStatusCode(401)->error($exception->getMessage(),40100);
+        return $this->error($exception->getMessage(),40100);
     }
 
 
