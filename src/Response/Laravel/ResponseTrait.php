@@ -124,7 +124,9 @@ trait ResponseTrait
             $trace = [];
         }
         return new JsonResponse(
-            compact('message','status','code','data','trace'),
+            $status === 'success'
+                ?compact('message','status','code','data')
+                :compact('message','status','code','data','trace'),
             $this->httpStatusCode,
             [],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
