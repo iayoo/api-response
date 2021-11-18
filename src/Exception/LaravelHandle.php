@@ -87,11 +87,29 @@ class LaravelHandle extends ExceptionHandler
             return $this->unauthenticated($request, $e);
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
+        } elseif ($e instanceof NotFoundHttpException){
+            return $this->undefined($request,$e);
         }
 
         return $this->shouldReturnJson($request, $e)
             ? $this->prepareJsonResponse($request, $e)
             : $this->prepareResponse($request, $e);
+    }
+
+    protected function undefined($request, NotFoundHttpException $exception){
+        if (!$this->shouldReturnJson($request, $exception)){
+            return $this->prepareResponse($request, $exception);
+        }
+        return new JsonResponse(
+            [
+                'message' => 'api undefined',
+                'status'  => 40000,
+                'data'    => [],
+            ],
+            200,
+            $this->isHttpException($exception) ? $exception->getHeaders() : [],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
