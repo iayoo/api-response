@@ -117,9 +117,10 @@ trait ResponseTrait
     {
         $status = $this->statusCode;
         $code = $this->errorCode;
-        $message = "系统异常:{$message}";
-        if (!env('APP_DEBUG')){
-            $message = "系统异常";
+        if ($status !== 'success'){
+            $message = env('APP_DEBUG')?"系统异常:{$message}":"系统异常";
+        }
+        if ($status === 'success'){
             $trace = [];
         }
         return new JsonResponse(
