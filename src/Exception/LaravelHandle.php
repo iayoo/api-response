@@ -87,10 +87,13 @@ class LaravelHandle extends ExceptionHandler
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
         } elseif ($e instanceof AuthenticationException) {
+            // 鉴权拦截
             return $this->unauthenticated($request, $e);
         } elseif ($e instanceof ValidationException) {
+            // 表单验证拦截
             return $this->convertValidationExceptionToResponse($e, $request);
         } elseif ($e instanceof NotFoundHttpException){
+            // 新增页面不存在的拦截
             return $this->undefined($request,$e);
         }
 
@@ -103,7 +106,7 @@ class LaravelHandle extends ExceptionHandler
         if (!$this->shouldReturnJson($request, $exception)){
             return $this->prepareResponse($request, $exception);
         }
-        return $this->setStatusCode(404)->error('api undefined','40400');
+        return $this->setStatusCode(404)->error('undefined',40400);
     }
 
     protected function unauthenticated($request, AuthenticationException $exception)
