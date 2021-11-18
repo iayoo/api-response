@@ -100,14 +100,15 @@ trait ResponseTrait
     {
 
         $status = method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 40000;
+        
         return new JsonResponse(
             [
                 'message' => $exception->getMessage(),
-                'status'  => $status,
+                'status'  => $this->statusCode,
                 'data'    => $this->convertExceptionToArray($exception),
             ],
             $this->httpStatusCode,
-            $this->isHttpException($e) ? $e->getHeaders() : [],
+            $this->isHttpException($exception) ? $exception->getHeaders() : [],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }
@@ -116,6 +117,11 @@ trait ResponseTrait
     {
         $status = $this->statusCode;
         $code = $this->errorCode;
+        $message = "系统异常:{$message}";
+        if (!env('APP_DEBUG')){
+            $message = "系统异常";
+            $trace = [];
+        }
         return new JsonResponse(
             compact('message','status','code','data','trace'),
             $this->httpStatusCode,
