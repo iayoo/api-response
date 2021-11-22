@@ -77,7 +77,6 @@ class LumenHandle extends ExceptionHandler
             return $e->getResponse();
         } elseif ($e instanceof NotFoundHttpException){
             // 新增页面不存在的拦截
-            dump($e);
             return $this->undefined();
         }
 
