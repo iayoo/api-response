@@ -118,12 +118,21 @@ class LaravelHandle extends ExceptionHandler
 
     public function prepareJsonResponse($request, Throwable $e)
     {
-        $this->setErrorCode(50000);
+        /** @var Logger $logger */
+        $logger = app('log');
+        $loggerClass = get_class($logger->getLogger());
+
+        if ($loggerClass === "Iayoo\MysqlLogger\monolog\mysql\Logger"){
+            $logId = $logger->getLogerId();
+        }else{
+            $logId = null;
+        }
+
+        $this->setErrorCode($logId?"50".str_pad((string)$logId,10,'0',STR_PAD_LEFT):50000);
         return $this->fail($e->getMessage(),[
             'line'     => $e->getLine(),
             'file'     => $e->getFile(),
             'exception'=> get_class($e),
-//            'previous' => $e->getPrevious(),
             'data'     => $e->getTrace(),
         ]);
     }
