@@ -117,7 +117,7 @@ trait ResponseTrait
     {
         $status = $this->statusCode;
         $code = $this->errorCode;
-        if ($status !== 'fail'){
+        if ($status === 'fail'){
             $message = env('APP_DEBUG')?"系统异常:{$message}":"系统异常";
         }
         if ($status === 'success'){
