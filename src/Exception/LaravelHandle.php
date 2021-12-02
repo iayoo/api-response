@@ -118,6 +118,9 @@ class LaravelHandle extends ExceptionHandler
 
     public function prepareJsonResponse($request, Throwable $e)
     {
+        if ($this->shouldntReport($e)){
+            return $this->error($e->getMessage());
+        }
         /** @var Logger $logger */
         $logger = app('log');
         $loggerClass = get_class($logger->getLogger());
