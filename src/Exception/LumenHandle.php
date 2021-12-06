@@ -54,7 +54,7 @@ class LumenHandle extends ExceptionHandler
             'file'     => $e->getFile(),
             'exception'=> get_class($e),
             'previous' => $e->getPrevious(),
-            'data'     => $e->getTrace(),
+            'data'     => $e->getTraceAsString(),
         ]);
     }
 
