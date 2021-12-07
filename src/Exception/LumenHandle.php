@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Illuminate\Support\Arr;
 
+
 class LumenHandle extends ExceptionHandler
 {
     use \Iayoo\ApiResponse\Response\Laravel\ResponseTrait;
