@@ -89,7 +89,7 @@ trait ResponseTrait
      *
      * @return JsonResponse
      */
-    public function error($message, $code = 40000)
+    public function error($message, $code = 40000,$errorData = [])
     {
         $this->setStatusCode('error');
         $this->setErrorCode($code);

@@ -90,7 +90,7 @@ class LaravelHandle extends ExceptionHandler
             return $this->unauthenticated($request, $e);
         } elseif ($e instanceof ValidationException) {
             // 表单验证拦截
-            return $this->convertValidationExceptionToResponse($e, $request);
+            return $this->ValidationExceptionError($e, $request);
         } elseif ($e instanceof NotFoundHttpException){
             // 新增页面不存在的拦截
             return $this->undefined($request,$e);
@@ -115,6 +115,17 @@ class LaravelHandle extends ExceptionHandler
         return $this->error($exception->getMessage(),40100);
     }
 
+    /**
+     * 验证起错误拦截响应
+     * @param ValidationException $e
+     * @param $request
+     * @return JsonResponse
+     */
+    protected function ValidationExceptionError(ValidationException $e, $request){
+        $error = $e->errors();
+        $message = Arr::first(Arr::first($error));
+        return $this->error($message,40100,$error);
+    }
 
     public function prepareJsonResponse($request, Throwable $e)
     {
