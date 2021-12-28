@@ -13,10 +13,11 @@ use think\exception\HttpResponseException;
 use think\exception\ValidateException;
 use think\Response;
 use Iayoo\ApiResponse\Response\ThinkPHP\ResponseTrait;
+use Throwable;
 
 class ThinkPHPHandle extends Handle
 {
-//    use ResponseTrait;
+    use ResponseTrait;
 
     /**
      * 不需要记录信息（日志）的异常类列表
@@ -43,6 +44,8 @@ class ThinkPHPHandle extends Handle
         parent::report($exception);
     }
 
+
+
     /**
      * Render an exception into an HTTP response.
      *
@@ -54,8 +57,15 @@ class ThinkPHPHandle extends Handle
     public function render($request, Throwable $e): Response
     {
         // 添加自定义异常处理机制
-
-        // 其他错误交给系统处理
-        return parent::render($request, $e);
+        $this->isJson = $request->isJson();
+        if ($e instanceof HttpResponseException) {
+            return $e->getResponse();
+        } elseif ($e instanceof HttpException) {
+            return $this->renderHttpException($e);
+        }  elseif ($e instanceof ValidateException) {
+            return $this->error($e->getMessage());
+        } else {
+            return $this->convertExceptionToResponse($e);
+        }
     }
 }
